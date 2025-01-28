@@ -14,16 +14,19 @@ public class Frappe {
     public static void updateTaskComplete(String[] words, Boolean complete) {
         if (words.length < 3) {
             if (words.length > 1) {
-                int idx = Integer.parseInt(words[1]) - 1;
-                if (idx >= 0 && idx < cur_idx) {
-                    tasks[idx].setComplete(complete);
-                    if (complete)
-                        System.out.println("Nice! I've marked this task as done:");
-                    else
-                        System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println(tasks[idx].getPrintOutput());
+                if (words[1].matches("[0-9]+")) {
+                    int idx = Integer.parseInt(words[1]) - 1;
+                    if (idx >= 0 && idx < cur_idx) {
+                        tasks[idx].setComplete(complete);
+                        if (complete)
+                            System.out.println("Nice! I've marked this task as done:");
+                        else
+                            System.out.println("OK, I've marked this task as not done yet:");
+                        System.out.println(tasks[idx].getPrintOutput());
+                    } else
+                        System.out.println("Given task number does not exist in list. Please try again.");
                 } else
-                    System.out.println("Given task number does not exist in list. Please try again.");
+                    System.out.println("No task number provided. Please try again.");
             } else
                 System.out.println("No task number provided. Please try again.");
         } else
