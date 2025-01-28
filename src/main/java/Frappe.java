@@ -8,6 +8,9 @@ public class Frappe {
     }
 
     public static void main(String[] args) {
+        String[] items = new String[100];
+        int cur_idx = 0;
+
         printUnderscoreLine();
         System.out.println("Hello! I'm Frappe.");
         System.out.println("What can I do for you?");
@@ -23,7 +26,18 @@ public class Frappe {
                 printUnderscoreLine();
                 break;
             } else {
-                System.out.println(input);
+                switch (input) {
+                case "list":
+                    for (int i = 0; i < cur_idx; i++) {
+                        System.out.print(String.format("%d. ", i + 1));
+                        System.out.println(items[i]);
+                    }
+                    break;
+                default:
+                    items[cur_idx] = input;
+                    cur_idx++;
+                    System.out.println("added: " + input);
+                }
             }
             printUnderscoreLine();
         }
