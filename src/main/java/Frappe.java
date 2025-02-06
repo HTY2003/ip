@@ -6,6 +6,11 @@ public class Frappe {
     public static Task[] tasks = new Task[100];
     public static int cur_idx = 0;
 
+    public static void printWelcome() {
+        System.out.println("Hello! I'm Frappe.");
+        System.out.println("What can I do for you?");
+    }
+
     public static void printUnderscoreLine() {
         System.out.println(new String(new char[50]).replace("\0", "_")
         );
@@ -21,31 +26,118 @@ public class Frappe {
         System.out.println("Invalid command format. Please try again.");
     }
 
+    public static void printBye() {
+        System.out.println("Bye. Hope to see you again soon!");
+        printUnderscoreLine();
+    }
+
+    public static void printTasks() {
+        System.out.println("Here are the tasks in your list:");
+        for (int i = 0; i < cur_idx; i++)
+            System.out.println(String.format("%d. ", i + 1) + tasks[i].getPrintOutput());
+    }
+
     public static void updateTaskComplete(String[] words, Boolean complete) {
-        if (words.length < 3) {
-            if (words.length > 1) {
-                if (words[1].matches("[0-9]+")) {
-                    int idx = Integer.parseInt(words[1]) - 1;
-                    if (idx >= 0 && idx < cur_idx) {
-                        tasks[idx].setComplete(complete);
-                        if (complete)
-                            System.out.println("Nice! I've marked this task as done:");
-                        else
-                            System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println(tasks[idx].getPrintOutput());
-                        return;
-                    }
-                }
-            }
+
+        if (words.length >= 3) {
+            printInvalidCommand();
+            return;
         }
 
-        printInvalidCommand();
+        if (words.length <= 1) {
+            printInvalidCommand();
+            return;
+        }
+
+        if (!(words[1].matches("[0-9]+"))) {
+            printInvalidCommand();
+            return;
+        }
+
+        int idx = Integer.parseInt(words[1]) - 1;
+
+        if (idx < 0 || idx >= cur_idx) {
+            printInvalidCommand();
+            return;
+        }
+
+        tasks[idx].setComplete(complete);
+        if (complete)
+            System.out.println("Nice! I've marked this task as done:");
+        else
+            System.out.println("OK, I've marked this task as not done yet:");
+        System.out.println(tasks[idx].getPrintOutput());
+    }
+
+    public static void addTodo(String[] words) {
+        String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
+        String name = String.join(" ", pre_input).trim();
+
+        if (name.length() == 0) {
+            printInvalidCommand();
+            return;
+        }
+
+        tasks[cur_idx] = new Todo(name);
+        cur_idx++;
+        printTaskAdded(tasks[cur_idx - 1]);
+    }
+
+    public static void addDeadline(String[] words) {
+        String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
+        String[] input = String.join(" ", pre_input).split("/by ");
+
+        if (input.length != 2) {
+            printInvalidCommand();
+            return;
+        }
+
+        String name = input[0].trim();
+        String by = input[1].trim();
+
+        if (name.length() == 0 || by.length() == 0) {
+            printInvalidCommand();
+            return;
+        }
+
+        tasks[cur_idx] = new Deadline(name, by);
+        cur_idx++;
+        printTaskAdded(tasks[cur_idx - 1]);
+    }
+
+    public static void addEvent(String[] words) {
+        String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
+        String[] input = String.join(" ", pre_input).split("/from ");
+
+        if (input.length != 2) {
+            printInvalidCommand();
+            return;
+        }
+
+        String[] input2 = input[1].split("/to");
+
+        if (input2.length != 2) {
+            printInvalidCommand();
+            return;
+        }
+
+        String name = input[0].trim();
+        String from = input2[0].trim();
+        String to = input2[1].trim();
+
+        if (name.length() == 0 || from.length() == 0 || to.length() == 0) {
+            printInvalidCommand();
+            return;
+        }
+
+        tasks[cur_idx] = new Event(name, from, to);
+        cur_idx++;
+        printTaskAdded(tasks[cur_idx - 1]);
     }
 
     public static void main(String[] args) {
         printUnderscoreLine();
-        System.out.println("Hello! I'm Frappe.");
-        System.out.println("What can I do for you?");
+        printWelcome();
         printUnderscoreLine();
 
         while (true) {
@@ -53,76 +145,37 @@ public class Frappe {
             String input = in.nextLine().trim();
 
             printUnderscoreLine();
+
             if (input.equals("bye")) {
-                System.out.println("Bye. Hope to see you again soon!");
-                printUnderscoreLine();
+                printBye();
                 break;
-            } else {
-                String[] words = input.split(" ");
-                switch (input) {
-                case "list":
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < cur_idx; i++)
-                        System.out.println(String.format("%d. ", i + 1) + tasks[i].getPrintOutput());
-                    break;
-                default:
-                    switch (words[0]) {
-                    case "mark":
-                        updateTaskComplete(words, true);
-                        break;
-                    case "unmark":
-                        updateTaskComplete(words, false);
-                        break;
-                    case "todo":
-                        String td = String.join(" ", Arrays.copyOfRange(words, 1, words.length)).trim();
-                        if (td.length() > 0) {
-                            tasks[cur_idx] = new Task(td);
-                            cur_idx++;
-                            printTaskAdded(tasks[cur_idx - 1]);
-                        } else
-                            printInvalidCommand();
-                        break;
-                    case "deadline":
-                        String[] dl_input = String.join(" ", Arrays.copyOfRange(words, 1, words.length)).split("/by ");
-                        if (dl_input.length == 2) {
-                            String dl = dl_input[0].trim();
-                            String by = dl_input[1].trim();
-
-                            if (dl.length() > 0 && by.length() > 0) {
-                                tasks[cur_idx] = new Deadline(dl, by);
-                                cur_idx++;
-                                printTaskAdded(tasks[cur_idx - 1]);
-                                break;
-                            }
-                        }
-                        printInvalidCommand();
-                        break;
-                    case "event":
-                        String[] evnt_input = String.join(" ", Arrays.copyOfRange(words, 1, words.length)).split("/from ");
-                        if (evnt_input.length == 2) {
-
-                            String[] evnt_input2 = evnt_input[1].split("/to");
-
-                            if (evnt_input2.length == 2) {
-                                String evnt = evnt_input[0].trim();
-                                String from = evnt_input2[0].trim();
-                                String to = evnt_input2[1].trim();
-
-                                if (evnt.length() > 0 && from.length() > 0 && to.length() > 0) {
-                                    tasks[cur_idx] = new Event(evnt, from, to);
-                                    cur_idx++;
-                                    printTaskAdded(tasks[cur_idx - 1]);
-                                    break;
-                                }
-                            }
-                        }
-                        printInvalidCommand();
-                        break;
-                    default:
-                        System.out.println("What can I do for you?");
-                    }
-                }
             }
+
+            String[] words = input.split(" ");
+
+            switch (words[0]) {
+            case "list":
+                printTasks();
+                break;
+            case "mark":
+                updateTaskComplete(words, true);
+                break;
+            case "unmark":
+                updateTaskComplete(words, false);
+                break;
+            case "todo":
+                addTodo(words);
+                break;
+            case "deadline":
+                addDeadline(words);
+                break;
+            case "event":
+                addEvent(words);
+                break;
+            default:
+                printInvalidCommand();
+            }
+
             printUnderscoreLine();
         }
     }
