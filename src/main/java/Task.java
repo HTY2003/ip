@@ -28,6 +28,6 @@ public class Task {
     }
 
     public String getTypeString() {
-        return "[T]";
+        return "[ ]";
     }
 }
