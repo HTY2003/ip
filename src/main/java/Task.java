@@ -8,7 +8,7 @@ public class Task {
     }
 
     public String getPrintOutput() {
-        return (complete ? "[X] " : "[ ] ") + this.name;
+        return this.getTypeString() + (complete ? "[X] " : "[ ] ") + this.name;
     }
 
     public void setComplete(Boolean complete) {
@@ -25,5 +25,9 @@ public class Task {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getTypeString() {
+        return "[T]";
     }
 }
