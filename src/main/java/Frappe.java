@@ -9,24 +9,24 @@ public class Frappe {
     public static void updateTaskDone(String[] words, Boolean isDone) {
 
         if (words.length >= 3) {
-            Printer.printInvalidCommand();
+            Printer.printTooManyWords();
             return;
         }
 
         if (words.length <= 1) {
-            Printer.printInvalidCommand();
+            Printer.printNoTaskNumber();
             return;
         }
 
         if (!(words[1].matches("[0-9]+"))) {
-            Printer.printInvalidCommand();
+            Printer.printNonNumTaskNumber();
             return;
         }
 
         int index = Integer.parseInt(words[1]) - 1;
 
         if (index < 0 || index >= currentIndex) {
-            Printer.printInvalidCommand();
+            Printer.printInvalidTaskNumber();
             return;
         }
 
@@ -36,13 +36,13 @@ public class Frappe {
 
     public static void addTodo(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String name = String.join(" ", pre_input).trim();
 
-        if (name.length() == 0) {
-            Printer.printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
             return;
         }
 
+        String name = String.join(" ", pre_input).trim();
         tasks[currentIndex] = new Todo(name);
         currentIndex++;
         Printer.printTaskAdded(tasks[currentIndex - 1]);
@@ -50,18 +50,29 @@ public class Frappe {
 
     public static void addDeadline(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String[] input = String.join(" ", pre_input).split("/by ");
 
-        if (input.length != 2) {
-            Printer.printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
+            return;
+        }
+
+        String[] input = String.join(" ", pre_input).split("/by");
+
+        if (input.length < 2) {
+            Printer.printNoBy();
+            return;
+        }
+
+        if (input.length > 2) {
+            Printer.printTooManyBy();
             return;
         }
 
         String name = input[0].trim();
         String doBy = input[1].trim();
 
-        if (name.length() == 0 || doBy.length() == 0) {
-            Printer.printInvalidCommand();
+        if (name.length() == 0) {
+            Printer.printNoName();
             return;
         }
 
@@ -72,17 +83,38 @@ public class Frappe {
 
     public static void addEvent(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String[] input = String.join(" ", pre_input).split("/from ");
 
-        if (input.length != 2) {
-            Printer.printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
             return;
         }
 
-        String[] input2 = input[1].split("/to");
+        String[] input = String.join(" ", pre_input).split("/from");
 
-        if (input2.length != 2) {
-            Printer.printInvalidCommand();
+        if (input.length < 2) {
+            Printer.printNoFrom();
+            return;
+        }
+
+        if (input.length > 2) {
+            Printer.printTooManyFrom();
+            return;
+        }
+
+        if (input[0].contains("/to")) {
+            Printer.printWrongToPosition();
+            return;
+        }
+
+        String[] input2 = String.join(" ", input[1]).split("/to");
+
+        if (input2.length < 2) {
+            Printer.printNoTo();
+            return;
+        }
+
+        if (input2.length > 2) {
+            Printer.printTooManyTo();
             return;
         }
 
@@ -90,8 +122,13 @@ public class Frappe {
         String from = input2[0].trim();
         String to = input2[1].trim();
 
-        if (name.length() == 0 || from.length() == 0 || to.length() == 0) {
-            Printer.printInvalidCommand();
+        if (name.length() == 0) {
+            Printer.printNoName();
+            return;
+        }
+
+        if (from.length() == 0) {
+            Printer.printNoFrom();
             return;
         }
 
@@ -138,7 +175,7 @@ public class Frappe {
                 addEvent(words);
                 break;
             default:
-                Printer.printInvalidCommand();
+                Printer.printUnknownCommand();
             }
 
             Printer.printUnderscoreLine();
