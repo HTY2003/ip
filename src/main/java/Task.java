@@ -1,22 +1,22 @@
 public class Task {
     protected String name;
-    protected boolean complete;
+    protected boolean isDone;
 
     public Task(String name) {
         this.name = name;
-        this.complete = false;
+        this.isDone = false;
     }
 
     public String getPrintOutput() {
-        return this.getTypeString() + (complete ? "[X] " : "[ ] ") + this.name;
+        return this.getTypeString() + (isDone ? "[X] " : "[ ] ") + this.name;
     }
 
-    public void setComplete(Boolean complete) {
-        this.complete = complete;
+    public void setDone(Boolean isDone) {
+        this.isDone = isDone;
     }
 
-    public Boolean getComplete() {
-        return this.complete;
+    public Boolean getDone() {
+        return this.isDone;
     }
 
     public void setName(String name) {

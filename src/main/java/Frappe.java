@@ -4,120 +4,117 @@ import java.util.Scanner;
 public class Frappe {
 
     public static Task[] tasks = new Task[100];
-    public static int cur_idx = 0;
+    public static int currentIndex = 0;
 
-    public static void printWelcome() {
-        System.out.println("Hello! I'm Frappe.");
-        System.out.println("What can I do for you?");
-    }
-
-    public static void printUnderscoreLine() {
-        System.out.println(new String(new char[50]).replace("\0", "_")
-        );
-    }
-
-    public static void printTaskAdded(Task task) {
-        System.out.println("Got it. I've added this task: ");
-        System.out.println(task.getPrintOutput());
-        System.out.println("Now you have " + String.valueOf(cur_idx) + (cur_idx == 1 ? " task " : " tasks ") + "in the list.");
-    }
-
-    public static void printInvalidCommand() {
-        System.out.println("Invalid command format. Please try again.");
-    }
-
-    public static void printBye() {
-        System.out.println("Bye. Hope to see you again soon!");
-        printUnderscoreLine();
-    }
-
-    public static void printTasks() {
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < cur_idx; i++)
-            System.out.println(String.format("%d. ", i + 1) + tasks[i].getPrintOutput());
-    }
-
-    public static void updateTaskComplete(String[] words, Boolean complete) {
+    public static void updateTaskDone(String[] words, Boolean isDone) {
 
         if (words.length >= 3) {
-            printInvalidCommand();
+            Printer.printTooManyWords();
             return;
         }
 
         if (words.length <= 1) {
-            printInvalidCommand();
+            Printer.printNoTaskNumber();
             return;
         }
 
         if (!(words[1].matches("[0-9]+"))) {
-            printInvalidCommand();
+            Printer.printNonNumTaskNumber();
             return;
         }
 
-        int idx = Integer.parseInt(words[1]) - 1;
+        int index = Integer.parseInt(words[1]) - 1;
 
-        if (idx < 0 || idx >= cur_idx) {
-            printInvalidCommand();
+        if (index < 0 || index >= currentIndex) {
+            Printer.printInvalidTaskNumber();
             return;
         }
 
-        tasks[idx].setComplete(complete);
-        if (complete)
-            System.out.println("Nice! I've marked this task as done:");
-        else
-            System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println(tasks[idx].getPrintOutput());
+        tasks[index].setDone(isDone);
+        Printer.printTaskDone(isDone, index);
     }
 
     public static void addTodo(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String name = String.join(" ", pre_input).trim();
 
-        if (name.length() == 0) {
-            printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
             return;
         }
 
-        tasks[cur_idx] = new Todo(name);
-        cur_idx++;
-        printTaskAdded(tasks[cur_idx - 1]);
+        String name = String.join(" ", pre_input).trim();
+        tasks[currentIndex] = new Todo(name);
+        currentIndex++;
+        Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
     public static void addDeadline(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String[] input = String.join(" ", pre_input).split("/by ");
 
-        if (input.length != 2) {
-            printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
+            return;
+        }
+
+        String[] input = String.join(" ", pre_input).split("/by");
+
+        if (input.length < 2) {
+            Printer.printNoBy();
+            return;
+        }
+
+        if (input.length > 2) {
+            Printer.printTooManyBy();
             return;
         }
 
         String name = input[0].trim();
-        String by = input[1].trim();
+        String doBy = input[1].trim();
 
-        if (name.length() == 0 || by.length() == 0) {
-            printInvalidCommand();
+        if (name.length() == 0) {
+            Printer.printNoName();
             return;
         }
 
-        tasks[cur_idx] = new Deadline(name, by);
-        cur_idx++;
-        printTaskAdded(tasks[cur_idx - 1]);
+        tasks[currentIndex] = new Deadline(name, doBy);
+        currentIndex++;
+        Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
     public static void addEvent(String[] words) {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
-        String[] input = String.join(" ", pre_input).split("/from ");
 
-        if (input.length != 2) {
-            printInvalidCommand();
+        if (pre_input.length == 0) {
+            Printer.printNoName();
             return;
         }
 
-        String[] input2 = input[1].split("/to");
+        String[] input = String.join(" ", pre_input).split("/from");
 
-        if (input2.length != 2) {
-            printInvalidCommand();
+        if (input.length < 2) {
+            Printer.printNoFrom();
+            return;
+        }
+
+        if (input.length > 2) {
+            Printer.printTooManyFrom();
+            return;
+        }
+
+        if (input[0].contains("/to")) {
+            Printer.printWrongToPosition();
+            return;
+        }
+
+        String[] input2 = String.join(" ", input[1]).split("/to");
+
+        if (input2.length < 2) {
+            Printer.printNoTo();
+            return;
+        }
+
+        if (input2.length > 2) {
+            Printer.printTooManyTo();
             return;
         }
 
@@ -125,29 +122,34 @@ public class Frappe {
         String from = input2[0].trim();
         String to = input2[1].trim();
 
-        if (name.length() == 0 || from.length() == 0 || to.length() == 0) {
-            printInvalidCommand();
+        if (name.length() == 0) {
+            Printer.printNoName();
             return;
         }
 
-        tasks[cur_idx] = new Event(name, from, to);
-        cur_idx++;
-        printTaskAdded(tasks[cur_idx - 1]);
+        if (from.length() == 0) {
+            Printer.printNoFrom();
+            return;
+        }
+
+        tasks[currentIndex] = new Event(name, from, to);
+        currentIndex++;
+        Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
     public static void main(String[] args) {
-        printUnderscoreLine();
-        printWelcome();
-        printUnderscoreLine();
+        Printer.printUnderscoreLine();
+        Printer.printWelcome();
+        Printer.printUnderscoreLine();
 
         while (true) {
             Scanner in = new Scanner(System.in);
             String input = in.nextLine().trim();
 
-            printUnderscoreLine();
+            Printer.printUnderscoreLine();
 
             if (input.equals("bye")) {
-                printBye();
+                Printer.printBye();
                 break;
             }
 
@@ -155,13 +157,13 @@ public class Frappe {
 
             switch (words[0]) {
             case "list":
-                printTasks();
+                Printer.printTasks();
                 break;
             case "mark":
-                updateTaskComplete(words, true);
+                updateTaskDone(words, true);
                 break;
             case "unmark":
-                updateTaskComplete(words, false);
+                updateTaskDone(words, false);
                 break;
             case "todo":
                 addTodo(words);
@@ -173,10 +175,10 @@ public class Frappe {
                 addEvent(words);
                 break;
             default:
-                printInvalidCommand();
+                Printer.printUnknownCommand();
             }
 
-            printUnderscoreLine();
+            Printer.printUnderscoreLine();
         }
     }
 }
