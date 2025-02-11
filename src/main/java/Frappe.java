@@ -6,40 +6,40 @@ public class Frappe {
     public static Task[] tasks = new Task[100];
     public static int currentIndex = 0;
 
-    public static void updateTaskDone(String[] words, Boolean isDone) {
+    public static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
 
         if (words.length >= 3) {
             Printer.printTooManyWords();
-            return;
+            throw new FrappeException();
         }
 
         if (words.length <= 1) {
             Printer.printNoTaskNumber();
-            return;
+            throw new FrappeException();
         }
 
         if (!(words[1].matches("[0-9]+"))) {
             Printer.printNonNumTaskNumber();
-            return;
+            throw new FrappeException();
         }
 
         int index = Integer.parseInt(words[1]) - 1;
 
         if (index < 0 || index >= currentIndex) {
             Printer.printInvalidTaskNumber();
-            return;
+            throw new FrappeException();
         }
 
         tasks[index].setDone(isDone);
         Printer.printTaskDone(isDone, index);
     }
 
-    public static void addTodo(String[] words) {
+    public static void addTodo(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
             Printer.printNoName();
-            return;
+            throw new FrappeException();
         }
 
         String name = String.join(" ", pre_input).trim();
@@ -48,24 +48,24 @@ public class Frappe {
         Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
-    public static void addDeadline(String[] words) {
+    public static void addDeadline(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
             Printer.printNoName();
-            return;
+            throw new FrappeException();
         }
 
         String[] input = String.join(" ", pre_input).split("/by");
 
         if (input.length < 2) {
             Printer.printNoBy();
-            return;
+            throw new FrappeException();
         }
 
         if (input.length > 2) {
             Printer.printTooManyBy();
-            return;
+            throw new FrappeException();
         }
 
         String name = input[0].trim();
@@ -73,7 +73,7 @@ public class Frappe {
 
         if (name.length() == 0) {
             Printer.printNoName();
-            return;
+            throw new FrappeException();
         }
 
         tasks[currentIndex] = new Deadline(name, doBy);
@@ -81,41 +81,41 @@ public class Frappe {
         Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
-    public static void addEvent(String[] words) {
+    public static void addEvent(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
             Printer.printNoName();
-            return;
+            throw new FrappeException();
         }
 
         String[] input = String.join(" ", pre_input).split("/from");
 
         if (input.length < 2) {
             Printer.printNoFrom();
-            return;
+            throw new FrappeException();
         }
 
         if (input.length > 2) {
             Printer.printTooManyFrom();
-            return;
+            throw new FrappeException();
         }
 
         if (input[0].contains("/to")) {
             Printer.printWrongToPosition();
-            return;
+            throw new FrappeException();
         }
 
         String[] input2 = String.join(" ", input[1]).split("/to");
 
         if (input2.length < 2) {
             Printer.printNoTo();
-            return;
+            throw new FrappeException();
         }
 
         if (input2.length > 2) {
             Printer.printTooManyTo();
-            return;
+            throw new FrappeException();
         }
 
         String name = input[0].trim();
@@ -124,17 +124,42 @@ public class Frappe {
 
         if (name.length() == 0) {
             Printer.printNoName();
-            return;
+            throw new FrappeException();
         }
 
         if (from.length() == 0) {
             Printer.printNoFrom();
-            return;
+            throw new FrappeException();
         }
 
         tasks[currentIndex] = new Event(name, from, to);
         currentIndex++;
         Printer.printTaskAdded(tasks[currentIndex - 1]);
+    }
+
+    public static void processInput(String[] words) throws FrappeException {
+        switch (words[0]) {
+        case "list":
+            Printer.printTasks();
+            break;
+        case "mark":
+            updateTaskDone(words, true);
+            break;
+        case "unmark":
+            updateTaskDone(words, false);
+            break;
+        case "todo":
+            addTodo(words);
+            break;
+        case "deadline":
+            addDeadline(words);
+            break;
+        case "event":
+            addEvent(words);
+            break;
+        default:
+            Printer.printUnknownCommand();
+        }
     }
 
     public static void main(String[] args) {
@@ -155,27 +180,10 @@ public class Frappe {
 
             String[] words = input.split(" ");
 
-            switch (words[0]) {
-            case "list":
-                Printer.printTasks();
-                break;
-            case "mark":
-                updateTaskDone(words, true);
-                break;
-            case "unmark":
-                updateTaskDone(words, false);
-                break;
-            case "todo":
-                addTodo(words);
-                break;
-            case "deadline":
-                addDeadline(words);
-                break;
-            case "event":
-                addEvent(words);
-                break;
-            default:
-                Printer.printUnknownCommand();
+            try {
+                processInput(words);
+            } catch (FrappeException e) {
+
             }
 
             Printer.printUnderscoreLine();
