@@ -1,22 +1,22 @@
 public class Deadline extends Task {
-    protected String do_by;
+    protected String doBy;
 
-    public Deadline(String name, String do_by) {
+    public Deadline(String name, String doBy) {
         super(name);
-        this.do_by = do_by;
+        this.doBy = doBy;
     }
 
-    public void setDoBy(String do_by) {
-        this.do_by = do_by;
+    public void setDoBy(String doBy) {
+        this.doBy = doBy;
     }
 
     public String getDoBy() {
-        return this.do_by;
+        return this.doBy;
     }
 
     @Override
     public String getPrintOutput() {
-        return super.getPrintOutput() + " (by: " + this.do_by + ")";
+        return super.getPrintOutput() + " (by: " + this.doBy + ")";
     }
 
     @Override
