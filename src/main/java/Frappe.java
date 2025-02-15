@@ -6,7 +6,7 @@ public class Frappe {
     public static Task[] tasks = new Task[100];
     public static int currentIndex = 0;
 
-    public static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
+    private static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
 
         if (words.length >= 3) {
             Printer.printTooManyWords();
@@ -34,7 +34,7 @@ public class Frappe {
         Printer.printTaskDone(isDone, index);
     }
 
-    public static void addTodo(String[] words) throws FrappeException {
+    private static void addTodo(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
@@ -48,7 +48,7 @@ public class Frappe {
         Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
-    public static void addDeadline(String[] words) throws FrappeException {
+    private static void addDeadline(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
@@ -81,7 +81,7 @@ public class Frappe {
         Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
-    public static void addEvent(String[] words) throws FrappeException {
+    private static void addEvent(String[] words) throws FrappeException {
         String[] pre_input = Arrays.copyOfRange(words, 1, words.length);
 
         if (pre_input.length == 0) {
@@ -137,7 +137,7 @@ public class Frappe {
         Printer.printTaskAdded(tasks[currentIndex - 1]);
     }
 
-    public static void processInput(String[] words) throws FrappeException {
+    private static void processInput(String[] words) throws FrappeException {
         switch (words[0]) {
         case "list":
             Printer.printTasks();
