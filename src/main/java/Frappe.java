@@ -8,15 +8,9 @@ import java.io.FileNotFoundException;
 
 public class Frappe {
     public static ArrayList<Task> tasks = new ArrayList<>();
+    public static final String saveFilePath = "../data/frappe.txt";
 
     private static int getTaskIndex(String[] words) throws FrappeException {
-    public static Task[] tasks = new Task[100];
-    public static int currentIndex = 0;
-
-    public static final String saveFilePath = "./data/frappe.txt";
-
-    private static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
-
         if (words.length >= 3) {
             throw new FrappeException(FrappeException.TOO_MANY_WORDS);
         }
@@ -79,7 +73,7 @@ public class Frappe {
         String name = input[0].trim();
         String doBy = input[1].trim();
 
-        if (name.length() == 0) {
+        if (name.isEmpty()) {
             throw new FrappeException(FrappeException.NO_NAME);
         }
 
@@ -123,11 +117,11 @@ public class Frappe {
         String from = input2[0].trim();
         String to = input2[1].trim();
 
-        if (name.length() == 0) {
+        if (name.isEmpty()) {
             throw new FrappeException(FrappeException.NO_NAME);
         }
 
-        if (from.length() == 0) {
+        if (from.isEmpty()) {
             throw new FrappeException(FrappeException.NO_FROM);
         }
 
@@ -170,6 +164,7 @@ public class Frappe {
             break;
         case "delete":
             removeTask(words);
+            saveTasks();
             break;
         default:
             throw new FrappeException(FrappeException.UNKNOWN_COMMAND);
@@ -180,13 +175,12 @@ public class Frappe {
 
         try {
             File saveFile = new File(saveFilePath);
+            saveFile.getParentFile().mkdirs();
             saveFile.createNewFile();
 
             FileWriter writer = new FileWriter(saveFilePath);
 
-            for (int i = 0; i < currentIndex; i++) {
-                Task task = tasks[i];
-
+            for (Task task : tasks) {
                 writer.write(task.getTypeString());
                 writer.write("\n");
                 writer.write((task.getDone() ? "1" : "0"));
@@ -271,8 +265,7 @@ public class Frappe {
                 }
 
                 task.setDone(marked);
-                tasks[currentIndex] = task;
-                currentIndex++;
+                tasks.add(task);
             }
         } catch (FileNotFoundException e) {
             throw new FrappeFileException(FrappeFileException.NO_SAVE_WARNING);
