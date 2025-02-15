@@ -12,6 +12,7 @@ public class Event extends Task {
         this.from = from;
     }
 
+    @Override
     public String getFrom() {
         return this.from;
     }
@@ -20,6 +21,7 @@ public class Event extends Task {
         this.to = to;
     }
 
+    @Override
     public String getTo() {
         return this.to;
     }
