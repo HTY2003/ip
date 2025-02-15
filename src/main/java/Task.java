@@ -30,4 +30,16 @@ public class Task {
     public String getTypeString() {
         return "[ ]";
     }
+
+    public String getDoBy() {
+        return "";
+    }
+
+    public String getFrom() {
+        return "";
+    }
+
+    public String getTo() {
+        return "";
+    }
 }

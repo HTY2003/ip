@@ -10,6 +10,7 @@ public class Deadline extends Task {
         this.doBy = doBy;
     }
 
+    @Override
     public String getDoBy() {
         return this.doBy;
     }
