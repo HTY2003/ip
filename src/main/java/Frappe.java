@@ -1,13 +1,11 @@
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Frappe {
+    public static ArrayList<Task> tasks = new ArrayList<>();
 
-    public static Task[] tasks = new Task[100];
-    public static int currentIndex = 0;
-
-    private static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
-
+    private static int getTaskIndex(String[] words) throws FrappeException {
         if (words.length >= 3) {
             throw new FrappeException(FrappeException.TOO_MANY_WORDS);
         }
@@ -22,11 +20,18 @@ public class Frappe {
 
         int index = Integer.parseInt(words[1]) - 1;
 
-        if (index < 0 || index >= currentIndex) {
+        if (index < 0 || index >= tasks.size()) {
             throw new FrappeException(FrappeException.OUT_OF_RANGE_TASK_NUMBER);
         }
 
-        tasks[index].setDone(isDone);
+        return index;
+    }
+
+    private static void updateTaskDone(String[] words, Boolean isDone) throws FrappeException {
+
+        int index = getTaskIndex(words);
+        Task task = tasks.get(index);
+        task.setDone(isDone);
         Printer.printTaskDone(isDone, index);
     }
 
@@ -38,9 +43,9 @@ public class Frappe {
         }
 
         String name = String.join(" ", preInput).trim();
-        tasks[currentIndex] = new Todo(name);
-        currentIndex++;
-        Printer.printTaskAdded(tasks[currentIndex - 1]);
+        Task task = new Todo(name);
+        tasks.add(task);
+        Printer.printTaskAdded(task);
     }
 
     private static void addDeadline(String[] words) throws FrappeException {
@@ -67,9 +72,9 @@ public class Frappe {
             throw new FrappeException(FrappeException.NO_NAME);
         }
 
-        tasks[currentIndex] = new Deadline(name, doBy);
-        currentIndex++;
-        Printer.printTaskAdded(tasks[currentIndex - 1]);
+        Task task = new Deadline(name, doBy);
+        tasks.add(task);
+        Printer.printTaskAdded(task);
     }
 
     private static void addEvent(String[] words) throws FrappeException {
@@ -115,9 +120,16 @@ public class Frappe {
             throw new FrappeException(FrappeException.NO_FROM);
         }
 
-        tasks[currentIndex] = new Event(name, from, to);
-        currentIndex++;
-        Printer.printTaskAdded(tasks[currentIndex - 1]);
+        Task task = new Event(name, from, to);
+        tasks.add(task);
+        Printer.printTaskAdded(task);
+    }
+
+    private static void removeTask(String[] words) throws FrappeException {
+        int index = getTaskIndex(words);
+        Task task = tasks.get(index);
+        tasks.remove(task);
+        Printer.printTaskRemoved(task);
     }
 
     private static void processInput(String[] words) throws FrappeException {
@@ -139,6 +151,9 @@ public class Frappe {
             break;
         case "event":
             addEvent(words);
+            break;
+        case "delete":
+            removeTask(words);
             break;
         default:
             throw new FrappeException(FrappeException.UNKNOWN_COMMAND);
