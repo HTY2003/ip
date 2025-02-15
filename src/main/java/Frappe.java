@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 
 public class Frappe {
     public static ArrayList<Task> tasks = new ArrayList<>();
-    public static final String saveFilePath = "../data/frappe.txt";
+    public static final String saveFilePath = "./data/frappe.txt";
 
     private static int getTaskIndex(String[] words) throws FrappeException {
         if (words.length >= 3) {
