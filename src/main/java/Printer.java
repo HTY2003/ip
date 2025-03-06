@@ -1,5 +1,6 @@
 /**
  * Helper class which handles all tasks related to printing chatbot responses.
+ * Some of the printing is also handled inside the TaskList class, with the help of this class.
  */
 public class Printer {
     /**
