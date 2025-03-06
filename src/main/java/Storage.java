@@ -5,18 +5,37 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Helper class which handles all save file-related tasks,
+ * namely loading save files during startup and saving to the save file after each command.
+ */
 public class Storage {
     public static final String defaultSaveFilePath = "./data/frappe.txt";
     protected String saveFilePath;
 
+    /**
+     * Constructs Storage object with default save file path ("./data/frappe.txt").
+     */
     public Storage() {
         this.saveFilePath = defaultSaveFilePath;
     }
 
+    /**
+     * Constructs Storage object with given save file path
+     *
+     * @param saveFilePath File path where tasks are stored and loaded
+     */
     public Storage(String saveFilePath) {
         this.saveFilePath = saveFilePath;
     }
 
+    /**
+     * Saves all Task objects in given TaskList to saveFilePath.
+     * Throws FrappeFileException if file cannot be created at saveFilePath.
+     *
+     * @param tasks TaskList object to be saved
+     * @throws FrappeFileException
+     */
     public void save(TaskList tasks) throws FrappeFileException {
         try {
             File saveFile = new File(saveFilePath);
@@ -52,6 +71,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Retrieves and returns Task objects stored in save file used to reconstruct TaskList objects.
+     * Throws FrappeFileException if save file does not exist, or is corrupted.
+     *
+     * @return ArrayList of Task objects
+     * @throws FrappeFileException
+     */
     public ArrayList<Task> load() throws FrappeFileException {
         try {
             File saveFile = new File(saveFilePath);

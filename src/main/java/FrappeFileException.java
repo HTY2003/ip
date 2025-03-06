@@ -1,7 +1,19 @@
+/**
+ * Exception for save file-related errors when using Frappe.
+ * This class also stores error messages commonly used with this exception.
+ */
 public class FrappeFileException extends FrappeException {
+    /**
+     * Constructs FrappeFileException object with empty message
+     */
     FrappeFileException() {
     }
 
+    /**
+     * Constructs FrappeFileException object with given message
+     *
+     * @param message: Exception message to be used
+     */
     FrappeFileException(String message) {
         this.message = message;
     }

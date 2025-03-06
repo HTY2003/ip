@@ -1,19 +1,42 @@
 import java.util.Arrays;
 
+/**
+ * Helper class which handles all tasks related to parsing user input and ensuring correct formats.
+ * Once the data is parsed (or rejected, in which case a FrappeException is thrown),
+ * the output usually gets passed to TaskList.
+ */
 public class Parser {
     protected String[] words;
-    protected TaskList tasks;
 
-    public Parser(String input, TaskList tasks) {
+    /**
+     * Constructs Parser object for given string input
+     *
+     * @param input Unfiltered user input
+     */
+    public Parser(String input) {
         this.words = input.split(" ");
-        this.tasks = tasks;
     }
 
+    /**
+     * Returns command word of user input
+     *
+     * @return Command word of user input (first word of user input if any, "" otherwise)
+     */
     public String getCommand() {
         return this.words[0];
     }
 
-    public int getTaskIndex() throws FrappeException {
+    /**
+     * Returns task index from user input if it is specified in the correct format,
+     * and is not out of range for the given TaskList.
+     * <p>
+     * If a valid task index cannot be extracted, FrappeException is thrown.
+     *
+     * @param tasks TaskList for range-checking of index
+     * @return Index of task to be retrieved
+     * @throws FrappeException
+     */
+    public int getTaskIndex(TaskList tasks) throws FrappeException {
         if (this.words.length >= 3) {
             throw new FrappeException(FrappeException.TOO_MANY_WORDS);
         }
@@ -35,6 +58,14 @@ public class Parser {
         return index;
     }
 
+    /**
+     * Retrieves and returns search term from user input.
+     * <p>
+     * If search term is empty, FrappeException is thrown.
+     *
+     * @return Search term of user input
+     * @throws FrappeException
+     */
     public String getSearchTerm() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(this.words, 1, this.words.length);
         if (preInput.length == 0) {
@@ -44,6 +75,14 @@ public class Parser {
         return String.join(" ", preInput).trim();
     }
 
+    /**
+     * Returns array containing task name retrieved from user input.
+     * <p>
+     * If user input format is invalid or any fields are empty, FrappeException is thrown.
+     *
+     * @return Array containing name of task to be added
+     * @throws FrappeException
+     */
     public String[] getTaskInfo() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(this.words, 1, this.words.length);
         if (preInput.length == 0) {
@@ -55,6 +94,14 @@ public class Parser {
         return new String[]{name};
     }
 
+    /**
+     * Returns array containing task name and doBy attributes retrieved from user input.
+     * <p>
+     * If user input format is invalid or any fields are empty, FrappeException is thrown.
+     *
+     * @return Array containing name and doBy of task to be added
+     * @throws FrappeException
+     */
     public String[] getDeadlineInfo() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(words, 1, words.length);
         if (preInput.length == 0) {
@@ -79,6 +126,14 @@ public class Parser {
         return new String[]{name, doBy};
     }
 
+    /**
+     * Returns array containing task name, from and to attributes retrieved from user input.
+     * <p>
+     * If user input format is invalid or any fields are empty, FrappeException is thrown.
+     *
+     * @return Array containing name, from and to of task to be added
+     * @throws FrappeException
+     */
     public String[] getEventInfo() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(words, 1, words.length);
         if (preInput.length == 0) {

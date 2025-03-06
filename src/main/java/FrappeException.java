@@ -1,10 +1,22 @@
+/**
+ * Exception for user input-related errors when using Frappe.
+ * This class also stores error messages commonly used with this exception.
+ */
 public class FrappeException extends Exception {
     public static String message = "";
 
+    /**
+     * Constructs FrappeException object with empty message
+     */
     FrappeException() {
 
     }
 
+    /**
+     * Constructs FrappeException object with given message
+     *
+     * @param message: Exception message to be used
+     */
     FrappeException(String message) {
         this.message = message;
     }

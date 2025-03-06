@@ -1,9 +1,23 @@
 import java.util.Scanner;
 
+/**
+ * Frappe is a simple CLI chatbot that can be used to store simple tasks, such as
+ * todos, deadlines and events. Additionally, you can search for tasks, and mark them as completed.
+ *
+ * @author Heng Teng Yi
+ * @version 1.0
+ * @since 2025-03-07
+ */
 public class Frappe {
     private TaskList tasks;
     private Storage storage;
 
+    /**
+     * Constructs Frappe object with given file path, and attempts to load previous save data from it.
+     * Given file path will also be where any new data is saved.
+     *
+     * @param filePath path of save file location
+     */
     public Frappe(String filePath) {
         storage = new Storage(filePath);
 
@@ -25,10 +39,10 @@ public class Frappe {
                 Printer.printMatchingTasks(results);
                 break;
             case "mark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(), true);
+                tasks.setTaskDone(parsedInput.getTaskIndex(tasks), true);
                 break;
             case "unmark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(), false);
+                tasks.setTaskDone(parsedInput.getTaskIndex(tasks), false);
                 break;
             case "todo":
                 tasks.addTodo(parsedInput.getTaskInfo());
@@ -40,7 +54,7 @@ public class Frappe {
                 tasks.addEvent(parsedInput.getEventInfo());
                 break;
             case "delete":
-                tasks.removeTask(parsedInput.getTaskIndex());
+                tasks.removeTask(parsedInput.getTaskIndex(tasks));
                 break;
             default:
                 throw new FrappeException(FrappeException.UNKNOWN_COMMAND);
@@ -49,7 +63,7 @@ public class Frappe {
         storage.save(tasks);
     }
 
-    public void run() {
+    private void run() {
         Printer.printUnderscoreLine();
         Printer.printWelcome();
         Printer.printUnderscoreLine();
@@ -57,7 +71,7 @@ public class Frappe {
         while (true) {
             Scanner in = new Scanner(System.in);
             String input = in.nextLine().trim();
-            Parser parsedInput = new Parser(input, tasks);
+            Parser parsedInput = new Parser(input);
 
             Printer.printUnderscoreLine();
 
@@ -76,6 +90,11 @@ public class Frappe {
         }
     }
 
+    /**
+     * Runs CLI chatbot with default save file path ("./data/frappe.txt").
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         new Frappe(Storage.defaultSaveFilePath).run();
     }
