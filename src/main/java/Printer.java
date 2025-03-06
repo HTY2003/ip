@@ -13,46 +13,43 @@ public class Printer {
         System.out.println(new String(new char[NUM_OF_UNDERSCORES]).replace("\0", "_"));
     }
 
-    private static void printTaskAndCount(Task task) {
+    private static void printTaskAndCount(Task task, int count) {
         System.out.println(task.getPrintOutput());
-        int size = Frappe.tasks.size();
         System.out.println("Now you have " +
-                String.valueOf(size) +
-                (size == 1 ? " task " : " tasks ") + "in the list.");
+                String.valueOf(count) +
+                (count == 1 ? " task " : " tasks ") + "in the list.");
     }
 
-    public static void printTaskAdded(Task task) {
+    public static void printTaskAdded(Task task, int count) {
         System.out.println("Got it. I've added this task: ");
-        printTaskAndCount(task);
+        printTaskAndCount(task, count);
     }
 
-    public static void printTaskRemoved(Task task) {
+    public static void printTaskRemoved(Task task, int count) {
         System.out.println("Got it. I've removed this task: ");
-        printTaskAndCount(task);
+        printTaskAndCount(task, count);
     }
 
-    public static void printTasks() {
-        if (Frappe.tasks.size() == 0) {
+    public static void printTasks(TaskList tasks) {
+        if (tasks.getSize() == 0) {
             System.out.println("You have no tasks in your list.");
             return;
         }
 
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < Frappe.tasks.size(); i++) {
-            Task task = Frappe.tasks.get(i);
+        for (int i = 0; i < tasks.getSize(); i++) {
+            Task task = tasks.getTask(i);
             System.out.println(String.format("%d. ", i + 1) +
                     task.getPrintOutput());
         }
     }
 
-    public static void printTaskDone(boolean isDone, int index) {
+    public static void printTaskDone(Task task, boolean isDone) {
         if (isDone) {
             System.out.println("Nice! I've marked this task as done:");
         } else {
             System.out.println("OK, I've marked this task as not done yet:");
         }
-
-        Task task = Frappe.tasks.get(index);
         System.out.println(task.getPrintOutput());
     }
 
