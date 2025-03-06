@@ -50,7 +50,7 @@ public class TaskList {
     public void removeTask(int index) {
         Task task = this.tasks.get(index);
         this.tasks.remove(task);
-        Printer.printTaskRemoved(task, this.tasks.size());
+        Printer.printTaskRemoved(task, this.getSize());
     }
 
     /**
@@ -74,7 +74,7 @@ public class TaskList {
         String name = info[0];
         Task task = new Todo(name);
         tasks.add(task);
-        Printer.printTaskAdded(task, this.tasks.size());
+        Printer.printTaskAdded(task, this.getSize());
     }
 
     /**
@@ -87,7 +87,7 @@ public class TaskList {
         String doBy = info[1];
         Task task = new Deadline(name, doBy);
         tasks.add(task);
-        Printer.printTaskAdded(task, this.tasks.size());
+        Printer.printTaskAdded(task, this.getSize());
     }
 
     /**
@@ -101,7 +101,7 @@ public class TaskList {
         String to = info[2];
         Task task = new Event(name, from, to);
         tasks.add(task);
-        Printer.printTaskAdded(task, this.tasks.size());
+        Printer.printTaskAdded(task, this.getSize());
     }
 
     /**
@@ -113,8 +113,10 @@ public class TaskList {
      */
     public TaskList getMatchingTasks(String searchTerm) {
         TaskList results = new TaskList();
-        for (Task task : this.tasks) {
-            if (task.getPrintOutput().contains(searchTerm)) {
+        for (int i = 0; i < this.getSize(); i++) {
+            Task task = this.getTask(i);
+            String printOutput = String.format("%d. ", i + 1) + task.getPrintOutput();
+            if (printOutput.contains(searchTerm)) {
                 results.tasks.add(task);
             }
         }
