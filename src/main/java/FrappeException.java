@@ -47,4 +47,7 @@ public class FrappeException extends Exception {
 
     public static final String TOO_MANY_TO = "Too many /to inputs provided. " +
             "Please try command again with only 1 /to input.";
+
+    public static final String NO_SEARCH_TERM = "No search term provided. " +
+            "Please try command again with a search term following it.";
 }

@@ -25,7 +25,8 @@ public class Storage {
 
             FileWriter writer = new FileWriter(saveFilePath);
 
-            for (Task task : tasks.getArrayList()) {
+            for (int i = 0; i < tasks.getSize(); i++) {
+                Task task = tasks.getTask(i);
                 writer.write(task.getTypeString());
                 writer.write("\n");
                 writer.write((task.getDone() ? "1" : "0"));

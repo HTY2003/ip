@@ -30,18 +30,26 @@ public class Printer {
         printTaskAndCount(task, count);
     }
 
-    public static void printTasks(TaskList tasks) {
+    public static void printTasks(TaskList tasks, String lineBeforePrint) {
         if (tasks.getSize() == 0) {
             System.out.println("You have no tasks in your list.");
             return;
         }
 
-        System.out.println("Here are the tasks in your list:");
+        System.out.println(lineBeforePrint);
         for (int i = 0; i < tasks.getSize(); i++) {
             Task task = tasks.getTask(i);
             System.out.println(String.format("%d. ", i + 1) +
                     task.getPrintOutput());
         }
+    }
+
+    public static void printAllTasks(TaskList tasks) {
+        printTasks(tasks, "Here are the tasks in your list:");
+    }
+
+    public static void printMatchingTasks(TaskList tasks) {
+        printTasks(tasks, "Here are the matching tasks in your list:");
     }
 
     public static void printTaskDone(Task task, boolean isDone) {

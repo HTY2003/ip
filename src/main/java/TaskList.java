@@ -15,10 +15,6 @@ public class TaskList {
         return this.tasks.size();
     }
 
-    public ArrayList<Task> getArrayList() {
-        return this.tasks;
-    }
-
     public Task getTask(int index) {
         return this.tasks.get(index);
     }
@@ -57,5 +53,16 @@ public class TaskList {
         Task task = new Event(name, from, to);
         tasks.add(task);
         Printer.printTaskAdded(task, this.tasks.size());
+    }
+
+    public TaskList getMatchingTasks(String searchTerm) {
+        TaskList results = new TaskList();
+        for (Task task : this.tasks) {
+            if (task.getPrintOutput().contains(searchTerm)) {
+                results.tasks.add(task);
+            }
+        }
+
+        return results;
     }
 }

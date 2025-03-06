@@ -35,6 +35,15 @@ public class Parser {
         return index;
     }
 
+    public String getSearchTerm() throws FrappeException {
+        String[] preInput = Arrays.copyOfRange(this.words, 1, this.words.length);
+        if (preInput.length == 0) {
+            throw new FrappeException(FrappeException.NO_SEARCH_TERM);
+        }
+
+        return String.join(" ", preInput).trim();
+    }
+
     public String[] getTaskInfo() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(this.words, 1, this.words.length);
         if (preInput.length == 0) {

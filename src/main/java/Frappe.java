@@ -18,7 +18,11 @@ public class Frappe {
     private void processInput(Parser parsedInput) throws FrappeException {
         switch (parsedInput.getCommand()) {
             case "list":
-                Printer.printTasks(tasks);
+                Printer.printAllTasks(tasks);
+                break;
+            case "find":
+                TaskList results = tasks.getMatchingTasks(parsedInput.getSearchTerm());
+                Printer.printMatchingTasks(results);
                 break;
             case "mark":
                 tasks.setTaskDone(parsedInput.getTaskIndex(), true);
