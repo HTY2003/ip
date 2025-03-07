@@ -11,6 +11,7 @@ import java.util.Scanner;
 public class Frappe {
     private TaskList tasks;
     private Storage storage;
+    private Parser parser;
 
     /**
      * Constructs Frappe object with given file path, and attempts to load previous save data from it.
@@ -20,6 +21,7 @@ public class Frappe {
      */
     public Frappe(String filePath) {
         storage = new Storage(filePath);
+        parser = new Parser();
 
         try {
             tasks = new TaskList(storage.loadTasks());
@@ -29,31 +31,33 @@ public class Frappe {
         }
     }
 
-    private void processInput(Parser parsedInput) throws FrappeException {
-        switch (parsedInput.getCommand()) {
+    private void processInput(Parser parser) throws FrappeException {
+        int tasksSize = tasks.getSize();
+
+        switch (parser.getCommandWord()) {
             case "todo":
-                tasks.addTodo(parsedInput.getTodoInfo());
+                tasks.addTodo(parser.getTodoInfo());
                 break;
             case "deadline":
-                tasks.addDeadline(parsedInput.getDeadlineInfo());
+                tasks.addDeadline(parser.getDeadlineInfo());
                 break;
             case "event":
-                tasks.addEvent(parsedInput.getEventInfo());
+                tasks.addEvent(parser.getEventInfo());
                 break;
             case "mark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(), true);
+                tasks.setTaskDone(parser.getTaskIndex(tasksSize), true);
                 break;
             case "unmark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(), false);
+                tasks.setTaskDone(parser.getTaskIndex(tasksSize), false);
                 break;
             case "delete":
-                tasks.removeTask(parsedInput.getTaskIndex());
+                tasks.removeTask(parser.getTaskIndex(tasksSize));
                 break;
             case "list":
                 Printer.printAllTasks(tasks);
                 break;
             case "find":
-                String searchTerm = parsedInput.getSearchTerm();
+                String searchTerm = parser.getSearchTerm();
                 TaskList results = tasks.getMatchingTasks(searchTerm);
                 Printer.printMatchingTasks(results);
                 break;
@@ -70,21 +74,17 @@ public class Frappe {
         Printer.printUnderscoreLine();
 
         while (true) {
-            Scanner in = new Scanner(System.in);
-            String rawInput = in.nextLine();
-            int tasksSize = tasks.getSize();
-            Parser parsedInput = new Parser(rawInput, tasksSize);
-
+            parser.collectNewCommand();
             Printer.printUnderscoreLine();
 
-            String command = parsedInput.getCommand();
+            String command = parser.getCommandWord();
             if (command.equals("bye")) {
                 Printer.printBye();
                 break;
             }
 
             try {
-                processInput(parsedInput);
+                processInput(parser);
             } catch (FrappeException e) {
                 Printer.printException(e);
             }

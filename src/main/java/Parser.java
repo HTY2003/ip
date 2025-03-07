@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Scanner;
 
 /**
  * Helper class which handles all tasks related to parsing user input and ensuring correct formats.
@@ -6,19 +7,23 @@ import java.util.Arrays;
  * the output usually gets passed to TaskList.
  */
 public class Parser {
+    protected Scanner in;
     protected String[] words;
-    protected int tasksSize;
 
     /**
-     * Constructs Parser object for given string input
-     *
-     * @param input     Unfiltered user input
-     * @param tasksSize Number of tasks at time of user input
+     * Constructs Parser object
      */
-    public Parser(String input, int tasksSize) {
-        String trimmedInput = input.trim();
+    public Parser() {
+        this.in = new Scanner(System.in);
+    }
+
+    /**
+     * Stalls program until user gives new line of input.
+     */
+    public void collectNewCommand() {
+        String rawInput = in.nextLine();
+        String trimmedInput = rawInput.trim();
         this.words = trimmedInput.split(" ");
-        this.tasksSize = tasksSize;
     }
 
     /**
@@ -26,7 +31,7 @@ public class Parser {
      *
      * @return Command word of user input (first word of user input if any, "" otherwise)
      */
-    public String getCommand() {
+    public String getCommandWord() {
         return this.words[0];
     }
 
@@ -39,7 +44,7 @@ public class Parser {
      * @return Index of task to be retrieved
      * @throws FrappeException
      */
-    public int getTaskIndex() throws FrappeException {
+    public int getTaskIndex(int tasksSize) throws FrappeException {
         if (this.words.length >= 3) {
             throw new FrappeException(FrappeException.TOO_MANY_WORDS);
         }
