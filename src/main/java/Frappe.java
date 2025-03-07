@@ -22,7 +22,7 @@ public class Frappe {
         storage = new Storage(filePath);
 
         try {
-            tasks = new TaskList(storage.load());
+            tasks = new TaskList(storage.loadTasks());
         } catch (FrappeFileException e) {
             tasks = new TaskList();
             Printer.printException(e);
@@ -31,21 +31,8 @@ public class Frappe {
 
     private void processInput(Parser parsedInput) throws FrappeException {
         switch (parsedInput.getCommand()) {
-            case "list":
-                Printer.printAllTasks(tasks);
-                break;
-            case "find":
-                TaskList results = tasks.getMatchingTasks(parsedInput.getSearchTerm());
-                Printer.printMatchingTasks(results);
-                break;
-            case "mark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(tasks), true);
-                break;
-            case "unmark":
-                tasks.setTaskDone(parsedInput.getTaskIndex(tasks), false);
-                break;
             case "todo":
-                tasks.addTodo(parsedInput.getTaskInfo());
+                tasks.addTodo(parsedInput.getTodoInfo());
                 break;
             case "deadline":
                 tasks.addDeadline(parsedInput.getDeadlineInfo());
@@ -53,14 +40,28 @@ public class Frappe {
             case "event":
                 tasks.addEvent(parsedInput.getEventInfo());
                 break;
+            case "mark":
+                tasks.setTaskDone(parsedInput.getTaskIndex(), true);
+                break;
+            case "unmark":
+                tasks.setTaskDone(parsedInput.getTaskIndex(), false);
+                break;
             case "delete":
-                tasks.removeTask(parsedInput.getTaskIndex(tasks));
+                tasks.removeTask(parsedInput.getTaskIndex());
+                break;
+            case "list":
+                Printer.printAllTasks(tasks);
+                break;
+            case "find":
+                String searchTerm = parsedInput.getSearchTerm();
+                TaskList results = tasks.getMatchingTasks(searchTerm);
+                Printer.printMatchingTasks(results);
                 break;
             default:
                 throw new FrappeException(FrappeException.UNKNOWN_COMMAND);
         }
 
-        storage.save(tasks);
+        storage.saveTasks(tasks);
     }
 
     private void run() {
@@ -70,12 +71,14 @@ public class Frappe {
 
         while (true) {
             Scanner in = new Scanner(System.in);
-            String input = in.nextLine().trim();
-            Parser parsedInput = new Parser(input);
+            String rawInput = in.nextLine();
+            int tasksSize = tasks.getSize();
+            Parser parsedInput = new Parser(rawInput, tasksSize);
 
             Printer.printUnderscoreLine();
 
-            if (parsedInput.getCommand().equals("bye")) {
+            String command = parsedInput.getCommand();
+            if (command.equals("bye")) {
                 Printer.printBye();
                 break;
             }

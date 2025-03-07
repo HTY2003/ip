@@ -7,14 +7,18 @@ import java.util.Arrays;
  */
 public class Parser {
     protected String[] words;
+    protected int tasksSize;
 
     /**
      * Constructs Parser object for given string input
      *
-     * @param input Unfiltered user input
+     * @param input     Unfiltered user input
+     * @param tasksSize Number of tasks at time of user input
      */
-    public Parser(String input) {
-        this.words = input.split(" ");
+    public Parser(String input, int tasksSize) {
+        String trimmedInput = input.trim();
+        this.words = trimmedInput.split(" ");
+        this.tasksSize = tasksSize;
     }
 
     /**
@@ -28,15 +32,14 @@ public class Parser {
 
     /**
      * Returns task index from user input if it is specified in the correct format,
-     * and is not out of range for the given TaskList.
+     * and is not out of the allowed range (current number of tasks).
      * <p>
      * If a valid task index cannot be extracted, FrappeException is thrown.
      *
-     * @param tasks TaskList for range-checking of index
      * @return Index of task to be retrieved
      * @throws FrappeException
      */
-    public int getTaskIndex(TaskList tasks) throws FrappeException {
+    public int getTaskIndex() throws FrappeException {
         if (this.words.length >= 3) {
             throw new FrappeException(FrappeException.TOO_MANY_WORDS);
         }
@@ -51,7 +54,7 @@ public class Parser {
 
         int index = Integer.parseInt(this.words[1]) - 1;
 
-        if (index < 0 || index >= tasks.getSize()) {
+        if (index < 0 || index >= tasksSize) {
             throw new FrappeException(FrappeException.OUT_OF_RANGE_TASK_NUMBER);
         }
 
@@ -83,14 +86,13 @@ public class Parser {
      * @return Array containing name of task to be added
      * @throws FrappeException
      */
-    public String[] getTaskInfo() throws FrappeException {
+    public String[] getTodoInfo() throws FrappeException {
         String[] preInput = Arrays.copyOfRange(this.words, 1, this.words.length);
         if (preInput.length == 0) {
             throw new FrappeException(FrappeException.NO_NAME);
         }
 
         String name = String.join(" ", preInput).trim();
-
         return new String[]{name};
     }
 

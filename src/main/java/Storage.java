@@ -30,13 +30,13 @@ public class Storage {
     }
 
     /**
-     * Saves all Task objects in given TaskList to saveFilePath.
+     * Saves all Task objects in given TaskList to file at saveFilePath.
      * Throws FrappeFileException if file cannot be created at saveFilePath.
      *
      * @param tasks TaskList object to be saved
      * @throws FrappeFileException
      */
-    public void save(TaskList tasks) throws FrappeFileException {
+    public void saveTasks(TaskList tasks) throws FrappeFileException {
         try {
             File saveFile = new File(saveFilePath);
             saveFile.getParentFile().mkdirs();
@@ -46,26 +46,35 @@ public class Storage {
 
             for (int i = 0; i < tasks.getSize(); i++) {
                 Task task = tasks.getTask(i);
-                writer.write(task.getTypeString());
-                writer.write("\n");
-                writer.write((task.getDone() ? "1" : "0"));
-                writer.write("\n");
-                writer.write(task.getName());
-                writer.write("\n");
+                this.saveTask(writer, task);
+            }
 
-                if (task instanceof Deadline) {
-                    writer.write(task.getDoBy());
-                    writer.write("\n");
-                } else if (task instanceof Event) {
-                    writer.write(task.getFrom());
-                    writer.write("\n");
-                    writer.write(task.getTo());
-                    writer.write("\n");
-                }
+            writer.close();
+        } catch (IOException e) {
+            throw new FrappeFileException(FrappeFileException.SAVE_FAILED_WARNING);
+        }
+    }
 
+    private void saveTask(FileWriter writer, Task task) throws FrappeFileException {
+        try {
+            writer.write(task.getTypeString());
+            writer.write("\n");
+            writer.write((task.getDone() ? "1" : "0"));
+            writer.write("\n");
+            writer.write(task.getName());
+            writer.write("\n");
+
+            if (task instanceof Deadline) {
+                writer.write(task.getDoBy());
+                writer.write("\n");
+            } else if (task instanceof Event) {
+                writer.write(task.getFrom());
+                writer.write("\n");
+                writer.write(task.getTo());
                 writer.write("\n");
             }
-            writer.close();
+
+            writer.write("\n");
         } catch (IOException e) {
             throw new FrappeFileException(FrappeFileException.SAVE_FAILED_WARNING);
         }
@@ -78,71 +87,90 @@ public class Storage {
      * @return ArrayList of Task objects
      * @throws FrappeFileException
      */
-    public ArrayList<Task> load() throws FrappeFileException {
+    public ArrayList<Task> loadTasks() throws FrappeFileException {
         try {
+            ArrayList<Task> loadedTasks = new ArrayList<Task>();
+
             File saveFile = new File(saveFilePath);
             Scanner in = new Scanner(saveFile);
-            ArrayList<Task> loadedTasks = new ArrayList<Task>();
             in.useDelimiter("\n\n");
+
             while (in.hasNext()) {
-                String input = in.next();
-                String[] inputs = input.split("\n");
-
-                for (int i = 0; i < inputs.length; i++) {
-                    inputs[i] = inputs[i].trim();
-                }
-
-                if (inputs.length < 2) {
-                    throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                }
-
-                Task task;
-                String name = inputs[2];
-                boolean marked;
-
-                if (inputs[1].equals("0")) {
-                    marked = false;
-                } else if (inputs[1].equals("1")) {
-                    marked = true;
-                } else {
-                    throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                }
-
-                switch (inputs[0]) {
-                    case "[T]":
-                        if (inputs.length != 3) {
-                            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                        }
-                        task = new Todo(name);
-                        break;
-
-                    case "[D]":
-                        if (inputs.length != 4) {
-                            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                        }
-                        String by = inputs[3];
-                        task = new Deadline(name, by);
-                        break;
-
-                    case "[E]":
-                        if (inputs.length != 5) {
-                            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                        }
-                        String from = inputs[3];
-                        String to = inputs[4];
-                        task = new Event(name, from, to);
-                        break;
-
-                    default:
-                        throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
-                }
-
-                task.setDone(marked);
-                loadedTasks.add(task);
+                String rawInput = in.next();
+                String[] inputs = this.parseRawInput(rawInput);
+                this.checkInputs(inputs);
+                loadedTasks.add(this.createTask(inputs));
             }
+
             return loadedTasks;
+
         } catch (FileNotFoundException e) {
             throw new FrappeFileException(FrappeFileException.NO_SAVE_WARNING);
         }
+    }
+
+    private String[] parseRawInput(String rawInput) {
+        String[] inputs = rawInput.split("\n");
+
+        for (int i = 0; i < inputs.length; i++) {
+            inputs[i] = inputs[i].trim();
+        }
+
+        return inputs;
+    }
+
+    private void checkInputs(String[] inputs) throws FrappeFileException {
+        if (inputs.length < 2) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+
+        if (!(inputs[1].equals("0") || inputs[1].equals("1"))) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+
+        if (!(inputs[0].equals("[T]") || inputs[0].equals("[D]") || inputs[0].equals("[E]"))) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+
+        if (inputs[0].equals("[T]") && inputs.length != 3) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+
+        if (inputs[0].equals("[D]") && inputs.length != 4) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+
+        if (inputs[0].equals("[E]") && inputs.length != 5) {
+            throw new FrappeFileException(FrappeFileException.CORRUPTED_SAVE_WARNING);
+        }
+    }
+
+    private Task createTask(String[] inputs) {
+        Task task = new Task("");
+        String name, doBy, from, to;
+
+        switch (inputs.length) {
+            case 3:
+                name = inputs[2];
+                task = new Todo(name);
+                break;
+            case 4:
+                name = inputs[2];
+                doBy = inputs[3];
+                task = new Deadline(name, doBy);
+                break;
+            case 5:
+                name = inputs[2];
+                from = inputs[3];
+                to = inputs[4];
+                task = new Event(name, from, to);
+                break;
+            default:
+                break;
+        }
+
+        boolean isDone = inputs[1].equals("1");
+        task.setDone(isDone);
+        return task;
     }
 }

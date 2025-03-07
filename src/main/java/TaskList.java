@@ -73,6 +73,7 @@ public class TaskList {
     public void addTodo(String[] info) {
         String name = info[0];
         Task task = new Todo(name);
+
         tasks.add(task);
         Printer.printTaskAdded(task, this.getSize());
     }
@@ -85,6 +86,7 @@ public class TaskList {
     public void addDeadline(String[] info) {
         String name = info[0];
         String doBy = info[1];
+
         Task task = new Deadline(name, doBy);
         tasks.add(task);
         Printer.printTaskAdded(task, this.getSize());
@@ -99,6 +101,7 @@ public class TaskList {
         String name = info[0];
         String from = info[1];
         String to = info[2];
+
         Task task = new Event(name, from, to);
         tasks.add(task);
         Printer.printTaskAdded(task, this.getSize());
@@ -113,9 +116,12 @@ public class TaskList {
      */
     public TaskList getMatchingTasks(String searchTerm) {
         TaskList results = new TaskList();
+
         for (int i = 0; i < this.getSize(); i++) {
             Task task = this.getTask(i);
-            String printOutput = String.format("%d. ", i + 1) + task.getPrintOutput();
+            String taskNumberString = String.format("%d. ", i + 1);
+            String printOutput = taskNumberString + task.getPrintOutput();
+
             if (printOutput.contains(searchTerm)) {
                 results.tasks.add(task);
             }

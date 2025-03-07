@@ -65,8 +65,8 @@ public class Printer {
         System.out.println(lineBeforeTasks);
         for (int i = 0; i < tasks.getSize(); i++) {
             Task task = tasks.getTask(i);
-            System.out.println(String.format("%d. ", i + 1) +
-                    task.getPrintOutput());
+            String taskNumberString = String.format("%d. ", i + 1);
+            System.out.println(taskNumberString + task.getPrintOutput());
         }
     }
 
