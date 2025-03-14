@@ -1,11 +1,9 @@
-import java.util.Scanner;
-
 /**
  * Frappe is a simple CLI chatbot that can be used to store simple tasks, such as
  * todos, deadlines and events. Additionally, you can search for tasks, and mark them as completed.
  *
  * @author Heng Teng Yi
- * @version 1.0
+ * @version 0.3
  * @since 2025-03-07
  */
 public class Frappe {
